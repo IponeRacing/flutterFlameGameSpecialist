@@ -48,6 +48,7 @@ dependencies:
   flame_forge2d: ^0.19.0           # Box2D physics integration
   flame_network_assets: ^1.0.0     # Cache assets from remote URLs (optional)
   bonfire: ^3.12.0                 # RPG/top-down extension on Flame (optional)
+  leap: ^0.10.0                    # Opinionated 2D platformer toolkit (kurtome/leap)
   google_fonts: ^6.2.1             # Pixel fonts: Press Start 2P, VT323, Orbitron
 
 dev_dependencies:
@@ -779,3 +780,198 @@ When building or extending a Flutter/Flame game:
 - [ ] `.tmx` and tileset PNGs co-located in `assets/tiles/`
 - [ ] `pauseEngine()` / `resumeEngine()` paired with `FlameAudio.bgm.pause()` / `.resume()`
 - [ ] Tested `onDetach()` / `onAttach()` app lifecycle — audio stops on background
+
+---
+
+## 17. ECOSYSTEM — PACKAGES, TUTORIALS & OPEN-SOURCE REFERENCES
+
+### 17.1 Extended Package Ecosystem
+
+| Package | Use case | Repo |
+|---------|----------|------|
+| `flame` | Core engine | github.com/flame-engine/flame |
+| `flame_audio` | SFX + BGM | (monorepo) |
+| `flame_tiled` | .tmx tilemaps | (monorepo) |
+| `flame_texturepacker` | TexturePacker spritesheets | github.com/Brixto/flame_texturepacker |
+| `flame_forge2d` | Box2D physics | (monorepo) |
+| `flame_network_assets` | Remote asset loading + cache | (monorepo) |
+| `bonfire` | RPG / top-down framework | github.com/RafaelBarbosatec/bonfire |
+| `leap` | Opinionated 2D platformer toolkit | github.com/kurtome/leap |
+
+**When to use `leap` vs raw Flame:**
+- `leap` = best for tile-based platformers (Super Mario style) — handles sloped tiles, moving platforms, coyote time, jump buffering out of the box
+- Raw Flame = more control, needed for non-platformer genres or custom physics
+
+**When to use `bonfire` vs raw Flame:**
+- `bonfire` = best for top-down RPGs with NPC dialogs, tile-based movement, camera zones
+- Raw Flame = better for action games, shooters, anything non-RPG
+
+---
+
+### 17.2 Tutorial Series (Video)
+
+**Complete game from scratch — imaNNeo (Color Switch, 2023)**
+Best series for learning the full Flame 1.x component lifecycle.
+- Playlist: https://www.youtube.com/playlist?list=PL1-_rCwRcnbNknvJ4fbnsn46_ww8V4CVh
+- Covers: FCS, camera, sprites, collision, UI, particles, audio, optimization
+
+**2D Platformer — DevKage**
+- Series: https://youtube.com/playlist?list=PLiZZKL9HLmWPyd808sda2ydG-dhexNONV
+- No Forge2D — pure Flame collision approach
+
+**Infinite Side Scroller (Dino Run) — DevKage**
+- Series: https://youtube.com/playlist?list=PLiZZKL9HLmWOmQgYxWHuOHOWsUUlhCCOY
+
+**Space Shooter — DevKage**
+- Series: https://www.youtube.com/playlist?list=PLiZZKL9HLmWPL0URlq9WLng1A_g1LDuxx
+
+**Box2D / Forge2D Physics — YayoCode (8 parts)**
+- https://yayocode.com/post/XPECczhhAZgJDGcy69AO (part 1)
+
+**Brick Breaker — Google Codelabs (official)**
+- https://codelabs.developers.google.com/codelabs/flutter-flame-brick-breaker
+- Uses Flutter state management bridge with Flame — reference for HUD integration
+
+**Real-time Multiplayer with Supabase — Tyler Shukert**
+- https://supabase.com/blog/flutter-real-time-multiplayer-game
+- Pattern: Supabase Realtime channels → broadcast player positions → Flame world update
+- Use when building multiplayer mini-games (racing, co-op puzzle, MMO-lite)
+
+---
+
+### 17.3 Open-Source Games to Study (by pattern)
+
+Study these repos to understand real production Flame code:
+
+| Game | Genre | What to learn | GitHub |
+|------|-------|---------------|--------|
+| **Spacescape** | Space shooter | SpriteComponent, scrolling, enemy patterns | github.com/ufrshubham/spacescape |
+| **Dino Run** | Infinite runner | procedural generation, obstacle spawning | github.com/ufrshubham/dino_run |
+| **Simple Platformer** | Platformer | tile collision without physics | github.com/ufrshubham/flame_simple_platformer |
+| **Darkness Dungeon** | RPG (bonfire) | bonfire NPC/dialog system | github.com/RafaelBarbosatec/darkness_dungeon |
+| **Save The Potato** | Casual | particle effects, game jam polish | github.com/imaNNeo/save_the_potato |
+| **Cycling Escape** | Racing/sim | complex game state, AI opponents | github.com/ikbendewilliam/CyclingEscape |
+| **New Super Jumper** | Platformer | Forge2D + Flame combined | github.com/Yayo-Arellano/flutter_games_compilation |
+| **Ghost Rigger** | Puzzle | hackathon architecture, quick prototyping | github.com/Float-like-a-dash-Sting-like-a-dart/GhostRigger |
+| **Penguin Chat** | Multiplayer | real-time position sync | github.com/Shadow60539/club_penguin_game |
+| **Xeonjia** | RPG/adventure | full game loop, progression | gitlab.com/deepdaikon/Xeonjia |
+
+---
+
+### 17.4 Game UI Design Reference
+
+**Game UI Database** — https://www.gameuidatabase.com/
+- 500+ shipped games, 19,000+ screenshots of actual game interfaces
+- Filter by: screen type (HUD, inventory, pause menu, leaderboard), genre, material, layout
+- Use BEFORE designing any game screen — see what conventions players expect per genre
+
+**Practical workflow:**
+1. Search your game genre (platformer / RPG / puzzle / shooter)
+2. Study HUD conventions: health display, score, coins, minimap placement
+3. Adapt to Flutter overlays (`GameWidget` + stack of positioned Flutter widgets)
+
+---
+
+### 17.5 `leap` Platformer Toolkit — Key Patterns
+
+```dart
+// pubspec.yaml
+dependencies:
+  leap: ^0.10.0
+
+// lib/game/my_platformer_game.dart
+import 'package:leap/leap.dart';
+
+class MyPlatformerGame extends LeapGame {
+  MyPlatformerGame() : super(
+    tileSize: 16,
+    configuration: const LeapConfiguration(
+      // Leap handles: slope collision, moving platforms,
+      // coyote time, jump buffering automatically
+    ),
+  );
+
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    // Load Tiled map — Leap reads standard Tiled layers
+    await loadWorldAndMap(
+      tiledMapPath: 'assets/tiles/level_01.tmx',
+    );
+    add(Player());
+  }
+}
+
+// Player extends PhysicalEntity (Leap's base for gravity+collision)
+class Player extends PhysicalEntity with HasGameRef<MyPlatformerGame> {
+  @override
+  Future<void> onLoad() async {
+    await super.onLoad();
+    // Leap automatically handles:
+    // - Gravity accumulation
+    // - Ground/slope collision from Tiled layers
+    // - Moving platform attachment
+  }
+
+  @override
+  void update(double dt) {
+    super.update(dt); // Leap physics step
+    // Add your input handling here
+    if (isOnGround && jumpPressed) {
+      velocity.y = -jumpForce;
+    }
+    velocity.x = moveInput * walkSpeed;
+  }
+}
+```
+
+**Tiled layer conventions Leap expects:**
+- Layer named `Terrain` (or configured) = solid collision tiles
+- Object layer named `Spawns` = entity spawn points
+- Slope support: tiles with custom property `slope` = `left` / `right`
+
+---
+
+### 17.6 Supabase Realtime Multiplayer Pattern
+
+```dart
+// lib/services/multiplayer_service.dart
+import 'package:supabase_flutter/supabase_flutter.dart';
+
+class MultiplayerService {
+  final _channel = Supabase.instance.client.channel('game_room_${roomId}');
+
+  void initialize(String roomId, void Function(Map) onPlayerUpdate) {
+    _channel
+      .onBroadcast(
+        event: 'player_update',
+        callback: (payload) => onPlayerUpdate(payload),
+      )
+      .subscribe();
+  }
+
+  // Call this in Flame's update() loop — throttle to 20-30 fps
+  void broadcastPosition(double x, double y, String playerId) {
+    _channel.sendBroadcastMessage(
+      event: 'player_update',
+      payload: {'id': playerId, 'x': x, 'y': y},
+    );
+  }
+
+  void dispose() => _channel.unsubscribe();
+}
+
+// In your Flame component:
+class RemotePlayer extends SpriteAnimationComponent {
+  void updateFromNetwork(double x, double y) {
+    // Interpolate for smooth movement
+    position.lerp(Vector2(x, y), 0.3);
+  }
+}
+```
+
+**Architecture for multiplayer Flame games:**
+- Supabase Realtime Broadcast (not Postgres changes) → lowest latency
+- Throttle broadcasts to 20 fps — `Flame.ticker` or manual `_elapsed` check in `update()`
+- Interpolate remote player positions — never teleport
+- Authoritative server for score/game-over — client-side for visual positions only
