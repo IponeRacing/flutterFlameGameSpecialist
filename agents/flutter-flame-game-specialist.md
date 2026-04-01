@@ -50,6 +50,11 @@ dependencies:
   bonfire: ^3.12.0                 # RPG/top-down extension on Flame (optional)
   leap: ^0.10.0                    # Opinionated 2D platformer toolkit (kurtome/leap)
   google_fonts: ^6.2.1             # Pixel fonts: Press Start 2P, VT323, Orbitron
+  # flame_3d: ^0.x.x              # ⚠️ EXPERIMENTAL — 3D via Flutter GPU/Impeller
+  #                                # NOT production-ready. API breaks every version.
+  #                                # Android/iOS/macOS only (no Web/Windows/Linux)
+  #                                # Requires: flutter run --enable-flutter-gpu
+  #                                # Use only for prototyping/research, not shipped apps.
 
 dev_dependencies:
   flame_lint: ^2.3.0               # Flame-specific linting rules
